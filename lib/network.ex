@@ -9,8 +9,18 @@ defmodule NetworkSimulation.Network do
   Adds the given host to the given network
   """
   def register_host(%NetworkSimulation.Network{} = net, %NetworkSimulation.Host{} = host) do
-    # TODO: Check that the host is not already in network
-    net = %NetworkSimulation.Network{hosts: [host | net.hosts]}
-    {:ok, net, host}
+    # Check that the host is not already in network
+    already_registered =
+      Enum.any?(net.hosts, fn registered_host ->
+        registered_host.address == host.address
+      end)
+
+    if already_registered do
+      {:address_unavailable, net, host}
+    else
+      # TODO: Assign a few neighbors
+      net = %NetworkSimulation.Network{hosts: [host | net.hosts]}
+      {:ok, net, host}
+    end
   end
 end
