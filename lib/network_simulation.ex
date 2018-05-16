@@ -1,17 +1,10 @@
 defmodule NetworkSimulation do
   @moduledoc """
   Documentation for NetworkSimulation.
+
+  TODO: Will this even be any different than just Network? Maybe this is a higher-level interface?
   """
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> NetworkSimulation.hello
-      :world
-
-  """
   def hello do
     :world
   end
