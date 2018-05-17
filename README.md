@@ -1,21 +1,16 @@
 # NetworkSimulation
 
-**TODO: Add description**
+A network simulator for experimenting with distributed communications protocols
 
-## Installation
+## Overview
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `network_simulation` to your list of dependencies in `mix.exs`:
+The `NetworkSimulation` module comes with the following submodules:
 
-```elixir
-def deps do
-  [
-    {:network_simulation, "~> 0.1.0"}
-  ]
-end
-```
+* `Network`
+  * A complete network simulator, handling routing and communication
+* `Host`
+  * A node in the network, containing just an address and neighboring hosts
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/network_simulation](https://hexdocs.pm/network_simulation).
+## Usage
 
+TODO: Usage

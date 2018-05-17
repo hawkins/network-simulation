@@ -18,7 +18,7 @@ defmodule NetworkSimulation.Network do
     if already_registered do
       {:address_unavailable, net, host}
     else
-      # TODO: Assign a few neighbors
+      # Assign a few neighbors
       neighboring_addresses = decide_neighbors(net, connecting_heuristic)
 
       neighbors =
@@ -31,9 +31,7 @@ defmodule NetworkSimulation.Network do
 
       # Update prior hosts with their new neighbor
       neighbors =
-        Enum.map(neighbors, fn n ->
-          %Host{address: n.address, neighbors: [host | n.neighbors]}
-        end)
+        Enum.map(neighbors, &%Host{address: &1.address, neighbors: [host | &1.neighbors]})
 
       # Update existing hosts in the net
       hosts =
