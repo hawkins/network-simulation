@@ -3,35 +3,28 @@ defmodule NetworkSimulation.NetworkTest do
   doctest NetworkSimulation.Network
 
   alias NetworkSimulation.Network, as: Network
-  alias NetworkSimulation.Host, as: Host
 
   test "can register new hosts" do
     net = %Network{}
-    assert length(net.hosts) == 0
+    assert length(net.pids) == 0
 
-    {status, net, _} = Network.register_host(net, %Host{address: "A"})
+    {:ok, net, _} = Network.register_host(net, "A")
 
-    assert status == :ok
-    assert length(net.hosts) == 1
+    assert length(net.pids) == 1
   end
 
   test "can't register duplicate hosts" do
-    host = %Host{address: "A"}
-    {status, net, _} = Network.register_host(%Network{}, host)
-    assert status == :ok
+    address = "A"
+    {:ok, net, _} = Network.register_host(%Network{}, address)
 
-    {status, _, _} = Network.register_host(net, host)
-    assert status == :address_unavailable
+    {:address_unavailable, _, _} = Network.register_host(net, address)
   end
 
   test "can decide neighbors" do
-    net = %Network{
-      hosts: [
-        %Host{address: "A"},
-        %Host{address: "B"},
-        %Host{address: "C"}
-      ]
-    }
+    net = %Network{}
+    {:ok, net, _} = Network.register_host(net, "A")
+    {:ok, net, _} = Network.register_host(net, "B")
+    {:ok, net, _} = Network.register_host(net, "C")
 
     assert length(Network.decide_neighbors(net, :random)) > 0
     assert length(Network.decide_neighbors(net, :none)) == 0
@@ -40,26 +33,32 @@ defmodule NetworkSimulation.NetworkTest do
   test "can register random neighbors" do
     net = %Network{}
 
-    {status, net, _} = Network.register_host(net, %Host{address: "A"})
+    {:ok, net, pidA} = Network.register_host(net, "A")
 
-    assert status == :ok
+    {:ok, _, pidB} = Network.register_host(net, "B")
 
-    {status, net, _} = Network.register_host(net, %Host{address: "B"})
+    send(pidB, {:get_neighbors, self()})
+    send(pidA, {:get_neighbors, self()})
 
-    assert status == :ok
-    Enum.map(net.hosts, &assert(length(&1.neighbors) == 1))
+    assert_receive neighbors, 500
+    assert length(neighbors) == 1
+    assert_receive neighbors, 500
+    assert length(neighbors) == 1
   end
 
   test "can add a disconnected host" do
     net = %Network{}
 
-    {status, net, _} = Network.register_host(net, %Host{address: "A"})
+    {:ok, net, pidA} = Network.register_host(net, "A")
 
-    assert status == :ok
+    {:ok, _, pidB} = Network.register_host(net, "B", :none)
 
-    {status, net, _} = Network.register_host(net, %Host{address: "B"}, :none)
+    send(pidB, {:get_neighbors, self()})
+    send(pidA, {:get_neighbors, self()})
 
-    assert status == :ok
-    Enum.map(net.hosts, &assert(length(&1.neighbors) == 0))
+    assert_receive neighbors, 500
+    assert length(neighbors) == 0
+    assert_receive neighbors, 500
+    assert length(neighbors) == 0
   end
 end
